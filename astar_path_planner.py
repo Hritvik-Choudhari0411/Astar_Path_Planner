@@ -1,10 +1,11 @@
+# Importing all libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from queue import PriorityQueue
 import time
 
-
+# Creating class that creates objects with following attributes
 class createNode:
     def __init__(self, pos, parent, c2c, tc):
         self.pos = pos
@@ -16,7 +17,7 @@ class createNode:
 def Round_05(x):
     return int(round(x, 0))
 
-
+# Functions to move in the allowed directions
 def Forward(L, node, goal_pos):
     actionCost = L
     x, y, th = node.pos
@@ -67,6 +68,7 @@ def Right60(L, node, goal_pos):
     return actionCost, cgoal, child_created
 
 
+# Function to create obstacles in the visualization space
 def Obstacle_space(dims):
     w, h = dims
     angle = np.deg2rad(30)
@@ -84,6 +86,7 @@ def Obstacle_space(dims):
     return grid
 
 
+# Function to check if the robot is in the obstacle space (including the clearance margin)
 def invade_obstacle(loc, gap):
     xMax, yMax = [600 + 1, 250 + 1]
     xMin, yMin = [0, 0]
@@ -127,6 +130,7 @@ def invade_obstacle(loc, gap):
         return True
 
 
+# Function to create possible children of a parent node within given constraints
 def get_child(node, L, goal_pos, gap):
     xMax, yMax = [600 + 1, 250 + 1]
     xMin, yMin = [0, 0]
@@ -175,6 +179,7 @@ def get_child(node, L, goal_pos, gap):
     return children
 
 
+# Function to create a backtrack path connecting all nodes resulting in shortest path by algorithm
 def backtrack(current):
     path = []
     parent = current
@@ -184,6 +189,7 @@ def backtrack(current):
     return path
 
 
+# A star path planning algorithm
 def Astar_algo(start_pos, goal_pos, L, gap):
     if not invade_obstacle(start_pos, gap):
         print("start_pos position is in Obstacle grid")
@@ -235,6 +241,7 @@ def Astar_algo(start_pos, goal_pos, L, gap):
                     viz.append(child_created)
 
 
+# Function to visualize the visited nodes and the shortest path using openCV
 def visualization(viz, pathTaken, start_pos, goal_pos):
     save = cv2.VideoWriter(r'C:\Users\hritv\Desktop\Spring 23\Planning\Proj3\video_Astar.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 10, (600 + 1, 250 + 1))
     grid = Obstacle_space((600, 250))
@@ -261,6 +268,8 @@ def visualization(viz, pathTaken, start_pos, goal_pos):
     end_time = time.time()
     print('Time taken to visualize in sec: ',(end_time - start_time))
 
+
+# User input variables
 xs= int(input('Enter start x-coordinate: '))
 ys= int(input('Enter start y-coordinate: '))
 ths= int(input('Enter start orientation in multiple of 30 deg: '))
@@ -271,7 +280,7 @@ yg= int(input('Enter goal y-coordinate: '))
 thg= int(input('Enter goal orientation in multiple of 30 deg: '))
 goal_pos= (xg,yg,thg)
 
-L= int(input('Enter step length: '))
+L= int(input('Enter step length (1<= L <10): '))
 gap = int(input('Enter clearance (robot radius + bloat): '))
 
 pathTaken,viz = Astar_algo(start_pos,goal_pos,L,gap)
